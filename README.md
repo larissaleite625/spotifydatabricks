@@ -1,6 +1,6 @@
 # Análise de Streaming do Spotify com Databricks e Enriquecimento de IA
 
-Este projeto de engenharia de dados implementa um pipeline completo na plataforma **Databricks** para processar, analisar e visualizar o histórico de streaming do Spotify. A arquitetura Medalhão (Bronze, Silver, Gold), culminando em um dashboard analítico no **Lakeview**.
+Este projeto de engenharia de dados implementa um pipeline completo na plataforma **Databricks** para processar, analisar e visualizar o histórico de streaming do Spotify. Usaremos a arquitetura Medalhão (Bronze, Silver, Gold), culminando em um dashboard analítico no **Lakeview**.
 
 O grande diferencial do projeto é um job automatizado que utiliza uma **LLM (DeepSeek)** para enriquecer os dados, classificando e atribuindo estilos musicais a cada faixa, permitindo análises de gênero mais profundas e precisas.
 
@@ -40,7 +40,7 @@ O pipeline foi desenhado para ser incremental e resiliente, processando um hist�
 A camada Bronze serve como o repositório inicial dos dados extraídos do Spotify. Neste projeto, ela é composta por múltiplas fontes que representam diferentes períodos de extração:
 
 - `bronze.spotify.spotify_analise`: Tabela principal contendo o histórico de streaming de 2014 a 2024. Esta fonte já passou por um tratamento inicial anteriormente.
-- `bronze.spotify.streaming_history_audio_2024_2025_10` e `bronze.spotify.streaming_history_audio_2025_11`: Novas tabelas com dados brutos incrementais, solicitados recentemente ao Spotify, cobrindo o final de 2024 e o ano de 2025.
+- `bronze.spotify.streaming_history_audio_2024_2025_10` e `bronze.spotify.streaming_history_audio_2025_11`: Novas tabelas com dados brutos incrementais, solicitados recentemente ao Spotify, cobrindo o final de 2024 e o ano de 2025 até setembro.
 
 ### 🥈 Camada Silver: Limpeza e Padronização
 
@@ -98,15 +98,18 @@ As análises são consolidadas em um dashboard no Databricks Lakeview, cujos gr�
 ---
 
 ## ▶️ Como Reproduzir no Databricks
+1. **Solicite seus dados ao Spotify**:
+    1. Acesse a página de privacidade da sua conta Spotify.
+    2. Na seção "Baixar seus dados", solicite uma cópia do seu Histórico de streaming. O Spotify levará alguns dias para processar e enviar os arquivos para você.
 
-1. **Clone o Repositório:** Utilize a funcionalidade "Repos" no Databricks para clonar este projeto.
-2. **Configure os Segredos:** Crie um Databricks Secret Scope chamado `SPOTIFY` e adicione uma chave chamada `APIKEY_DEEPSEEK` com sua chave da API.
-3. **Execute os Notebooks:** Siga a ordem para construir o pipeline:
-   1. `src/spotify_project/Silver 2014-2024.ipynb`
-   2. `src/spotify_project/Silver 2025.ipynb`
-   3. `src/spotify_project/Estilos com Deep Seek.ipynb`
-4. **Importe o Dashboard:** No Databricks Lakeview, importe o arquivo `dashs/Spotify.lvdash.json`.
-5. **Agende o Job (Opcional):** Em "Workflows", crie um novo job usando o arquivo `workflows/Estilos.yaml` para automatizar o enriquecimento.
+2. **Ingestão para a Camada Bronze:** Você receberá vários arquivos JSON. No Databricks, utilize a funcionalidade de "Upload Data" na UI para carregar todos esses arquivos e criar tabelas. Você pode fazer todo o processo via interface mesmo, com poucos códigos.
+
+3. **Adapte e Execute o Pipeline Silver:** Os notebooks já incluem o tratamento para o histórico de músicas. Você pode adaptá-los para incluir dados de podcasts, se desejar, ajustando os filtros e a lógica de tratamento.
+4. **Configure e Execute a Camada Gold:** 
+    1. Configure os secrets: Crie um Databricks Secret Scope chamado SPOTIFY e adicione uma chave chamada APIKEY_DEEPSEEK com sua chave da API da DeepSeek.
+    2. Execute o Job de Enriquecimento: Rode o notebook Estilos com Deep Seek.ipynb. Ele irá automaticamente identificar as músicas sem estilo na sua camada Silver e começar a classificá-las em lotes.
+5. **Importe o Dashboard:** No Databricks Lakeview, importe o arquivo `dashs/Spotify.lvdash.json`.
+6. **Agende o Job (Opcional):** Em "Workflows", crie um novo job usando o arquivo `workflows/Estilos.yaml` para automatizar o enriquecimento.
 
 ---
 
@@ -117,3 +120,15 @@ As análises são consolidadas em um dashboard no Databricks Lakeview, cujos gr�
 - **IA / LLM:** API da DeepSeek para enriquecimento de dados
 - **Arquitetura:** Medalhão (Bronze, Silver, Gold)
 - **CI/CD:** Databricks Repos com integração GitHub
+
+## 🚀 Futuro
+
+- **Análise de Sentimentos com IBM Watson:**
+    - Enviar as letras para a API do IBM Watson Natural Language Understanding para extrair o sentimento (positivo, negativo, neutro) e emoções (alegria, raiva, tristeza) de cada faixa.
+    - Isso permitiria criar dashboards para analisar o "humor" musical ao longo do tempo.
+
+- **Enriquecimento com a API Web do Spotify:**
+
+    - Usar a API oficial do Spotify para enriquecer a tabela de estilos (gold.spotify.spotify_musicas) com features de áudio para cada faixa.
+    - Atributos como danceability, energy, acousticness, valence (positividade) e tempo poderiam ser adicionados.
+    - Isso possibilitaria análises técnicas sobre as características das músicas mais ouvidas e a criação de um sistema de recomendação pessoal.
