@@ -1,0 +1,17 @@
+resources:
+  jobs:
+    GetAlbum:
+      name: GetAlbum
+      schedule:
+        quartz_cron_expression: 3 29/30 * * * ?
+        timezone_id: UTC
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: GetAlbum
+          notebook_task:
+            notebook_path: /Workspace/Users/larissadeathayde3@gmail.com/spotifydatabricks/src/spotify_project/Get
+              Album
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
