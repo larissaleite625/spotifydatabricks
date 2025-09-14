@@ -1,0 +1,896 @@
+{
+  "datasets": [
+    {
+      "name": "7edf2d93",
+      "displayName": "total_sum_tempo",
+      "queryLines": [
+        "SELECT\r\n",
+        "  TO_DATE(CONCAT(year, '-', month), 'yyyy-M') AS mes_ano,\r\n",
+        "  SUM(hours_played) AS total_horas_ouvidas \r\n",
+        "FROM\r\n",
+        "  gold.spotify.streaming_history_com_estilos\r\n",
+        "GROUP BY\r\n",
+        "  mes_ano\r\n",
+        "ORDER BY\r\n",
+        "  mes_ano;"
+      ]
+    },
+    {
+      "name": "f367d883",
+      "displayName": "top20_count",
+      "queryLines": [
+        "SELECT\r\n",
+        "  master_metadata_album_artist_name,\r\n",
+        "  COUNT(*) AS plays\r\n",
+        "FROM\r\n",
+        "  gold.spotify.streaming_history_com_estilos\r\n",
+        "WHERE\r\n",
+        "  master_metadata_album_artist_name not in ('null', 'The Red Army Choir')\r\n",
+        "GROUP BY\r\n",
+        "  master_metadata_album_artist_name\r\n",
+        "ORDER BY\r\n",
+        "  plays DESC\r\n",
+        "LIMIT 20;"
+      ]
+    },
+    {
+      "name": "d329f988",
+      "displayName": "top20_sum_hr",
+      "queryLines": [
+        "SELECT\r\n",
+        "  master_metadata_album_artist_name,\r\n",
+        "  SUM(minutes_played) AS total_horas_ouvidas\r\n",
+        "FROM gold.spotify.streaming_history_com_estilos\r\n",
+        "WHERE master_metadata_album_artist_name not in ('null', 'The Red Army Choir')\r\n",
+        "GROUP BY master_metadata_album_artist_name\r\n",
+        "ORDER BY total_horas_ouvidas DESC\r\n",
+        "LIMIT 20;\r\n"
+      ]
+    },
+    {
+      "name": "3cb01b6b",
+      "displayName": "Generos_musicais",
+      "queryLines": [
+        "SELECT\r\n",
+        "  style,\r\n",
+        "  sum(hours_played) AS horas_escutadas\r\n",
+        "FROM\r\n",
+        "gold.spotify.streaming_history_com_estilos\r\n",
+        "WHERE\r\n",
+        "  style <> 'unknown' or style IS NOT NULL\r\n",
+        "GROUP BY\r\n",
+        "  style\r\n",
+        "ORDER BY\r\n",
+        "  horas_escutadas DESC\r\n",
+        "  limit 10;"
+      ]
+    },
+    {
+      "name": "f659f038",
+      "displayName": "Estilos ao longo do tempo",
+      "queryLines": [
+        "WITH top_styles AS (\r\n",
+        "  SELECT style, SUM(hours_played) AS horas\r\n",
+        "  FROM gold.spotify.streaming_history_com_estilos\r\n",
+        "  WHERE style <> 'unknown'\r\n",
+        "  GROUP BY style\r\n",
+        "  ORDER BY horas DESC\r\n",
+        "  LIMIT 5\r\n",
+        "),\r\n",
+        "base AS (\r\n",
+        "  SELECT date_trunc('month', from_utc_timestamp(ts,'America/Sao_Paulo')) AS mes,\r\n",
+        "         s.style,\r\n",
+        "         hours_played\r\n",
+        "  FROM gold.spotify.streaming_history_com_estilos s\r\n",
+        "  JOIN top_styles t ON s.style = t.style\r\n",
+        ")\r\n",
+        "SELECT mes, style, SUM(hours_played) AS minutos\r\n",
+        "FROM base\r\n",
+        "GROUP BY 1,2\r\n",
+        "ORDER BY 1,2;\r\n"
+      ]
+    },
+    {
+      "name": "a93ca6de",
+      "displayName": "Top 10 músicas",
+      "queryLines": [
+        "SELECT \r\n",
+        "  master_metadata_track_name        AS faixa,\r\n",
+        "  master_metadata_album_artist_name AS artista,\r\n",
+        "  ROUND(SUM(hours_played), 2)  AS horas_ouvidas\r\n",
+        "FROM gold.spotify.streaming_history_com_estilos\r\n",
+        "where master_metadata_track_name not in ('National Anthem of USSR', 'null', 'Jorginho Me Empresta a 12')\r\n",
+        "GROUP BY 1,2\r\n",
+        "ORDER BY horas_ouvidas DESC\r\n",
+        "LIMIT 20;\r\n"
+      ]
+    },
+    {
+      "name": "cf8c271e",
+      "displayName": "Top 1 artista mais escutado do ano",
+      "queryLines": [
+        "SELECT \r\n",
+        "  year,\r\n",
+        "  master_metadata_album_artist_name AS artista,\r\n",
+        "  ROUND(SUM(minutes_played)/60, 2)  AS horas_ouvidas,\r\n",
+        "  CONCAT(CAST(year AS STRING), ' — ', master_metadata_album_artist_name) AS ano_artista,\r\n",
+        "  RANK() OVER (PARTITION BY year ORDER BY SUM(minutes_played) DESC) AS rk\r\n",
+        "FROM gold.spotify.streaming_history_com_estilos\r\n",
+        "WHERE master_metadata_album_artist_name <> 'null'\r\n",
+        "GROUP BY year, artista\r\n",
+        "QUALIFY rk = 1\r\n",
+        "ORDER BY year DESC;\r\n"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "dc383cf6",
+      "displayName": "Painel",
+      "layout": [
+        {
+          "widget": {
+            "name": "477d732b",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7edf2d93",
+                  "fields": [
+                    {
+                      "name": "monthly(mes_ano)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `mes_ano`)"
+                    },
+                    {
+                      "name": "sum(total_horas_ouvidas)",
+                      "expression": "SUM(`total_horas_ouvidas`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(mes_ano)",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "displayName": "mes_ano"
+                },
+                "y": {
+                  "fieldName": "sum(total_horas_ouvidas)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of total_horas_ouvidas"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total de horas ouvidas por mês"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "aa004eb0",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f367d883",
+                  "fields": [
+                    {
+                      "name": "sum(plays)",
+                      "expression": "SUM(`plays`)"
+                    },
+                    {
+                      "name": "master_metadata_album_artist_name",
+                      "expression": "`master_metadata_album_artist_name`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(plays)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of plays"
+                },
+                "y": {
+                  "fieldName": "master_metadata_album_artist_name",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "displayName": "master_metadata_album_artist_name"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Top 20 Artistas (Count Plays)"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 3,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "45d03909",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d329f988",
+                  "fields": [
+                    {
+                      "name": "sum(total_horas_ouvidas)",
+                      "expression": "SUM(`total_horas_ouvidas`)"
+                    },
+                    {
+                      "name": "master_metadata_album_artist_name",
+                      "expression": "`master_metadata_album_artist_name`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(total_horas_ouvidas)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of total_horas_ouvidas"
+                },
+                "y": {
+                  "fieldName": "master_metadata_album_artist_name",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "displayName": "master_metadata_album_artist_name"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Top 20 Artistas (Soma de Horas)"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 3,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "19a8b340",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3cb01b6b",
+                  "fields": [
+                    {
+                      "name": "sum(horas_escutadas)",
+                      "expression": "SUM(`horas_escutadas`)"
+                    },
+                    {
+                      "name": "style",
+                      "expression": "`style`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(horas_escutadas)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of horas_escutadas"
+                },
+                "color": {
+                  "fieldName": "style",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "Heavy Metal",
+                        "color": "#556B2F"
+                      },
+                      {
+                        "value": "Thrash Metal",
+                        "color": "#008000"
+                      },
+                      {
+                        "value": "Groove Metal",
+                        "color": "#2E8B57"
+                      },
+                      {
+                        "value": "Pop",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 5
+                        }
+                      },
+                      {
+                        "value": "Afro-Brazilian Music",
+                        "color": "#417A83"
+                      },
+                      {
+                        "value": "House",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 1
+                        }
+                      },
+                      {
+                        "value": "Hip Hop",
+                        "color": "#6663DA"
+                      },
+                      {
+                        "value": "Nu Metal",
+                        "color": "#79A55F"
+                      },
+                      {
+                        "value": "Brazilian Popular Music",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 2
+                        }
+                      },
+                      {
+                        "value": "Metalcore",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      },
+                      {
+                        "value": "Power Metal",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 1
+                        }
+                      }
+                    ]
+                  },
+                  "displayName": "style"
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "title": "Distribuição de Estilos Musicais",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 13,
+            "width": 3,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "6da23901",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f659f038",
+                  "fields": [
+                    {
+                      "name": "style",
+                      "expression": "`style`"
+                    },
+                    {
+                      "name": "monthly(mes)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `mes`)"
+                    },
+                    {
+                      "name": "sum(minutos)",
+                      "expression": "SUM(`minutos`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "area",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(mes)",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "displayName": "mes"
+                },
+                "y": {
+                  "fieldName": "sum(minutos)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of minutos"
+                },
+                "color": {
+                  "fieldName": "style",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "Heavy Metal",
+                        "color": "#7FFFD4"
+                      },
+                      {
+                        "value": "Hip Hop",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 1
+                        }
+                      },
+                      {
+                        "value": "Progressive Metal",
+                        "color": "#00FFFF"
+                      },
+                      {
+                        "value": "Thrash Metal",
+                        "color": "#454B1B"
+                      },
+                      {
+                        "value": "Groove Metal",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  },
+                  "displayName": "style"
+                }
+              },
+              "frame": {
+                "title": "Área empilhada dos 5 estilos com mais minutos por mês",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 28,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "a7849dfd",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a93ca6de",
+                  "fields": [
+                    {
+                      "name": "faixa",
+                      "expression": "`faixa`"
+                    },
+                    {
+                      "name": "artista",
+                      "expression": "`artista`"
+                    },
+                    {
+                      "name": "horas_ouvidas",
+                      "expression": "`horas_ouvidas`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "faixa",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100000,
+                    "title": "faixa",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "faixa"
+                  },
+                  {
+                    "fieldName": "artista",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100001,
+                    "title": "artista",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "artista"
+                  },
+                  {
+                    "fieldName": "horas_ouvidas",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100002,
+                    "title": "horas_ouvidas",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "horas_ouvidas"
+                  }
+                ]
+              },
+              "invisibleColumns": [],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": true,
+              "frame": {
+                "title": "Top 10 músicas por soma de horas escutadas",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 6,
+            "width": 3,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "986300da",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cf8c271e",
+                  "fields": [
+                    {
+                      "name": "ano_artista",
+                      "expression": "`ano_artista`"
+                    },
+                    {
+                      "name": "sum(horas_ouvidas)",
+                      "expression": "SUM(`horas_ouvidas`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(horas_ouvidas)",
+                  "axis": {
+                    "hideTitle": false,
+                    "hideLabels": false
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of horas_ouvidas"
+                },
+                "y": {
+                  "fieldName": "ano_artista",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "ano_artista"
+                },
+                "label": {
+                  "show": true
+                },
+                "extra": [
+                  {
+                    "fieldName": "ano_artista",
+                    "displayName": "ano_artista"
+                  }
+                ]
+              },
+              "frame": {
+                "title": "Artista mais escutado de cada ano",
+                "showTitle": true
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 20,
+            "width": 6,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    }
+  }
+}
