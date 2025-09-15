@@ -15,8 +15,7 @@ O projeto está organizado com uma estrutura clara para separar a lógica do pip
 
 spotifydatabricks/
 ├── src/
-│   └── spotify\_project/
-│       ├── Silver 2014-2024.ipynb
+│   └── Silver 2014-2024.ipynb
 │       ├── Silver 2025.ipynb
         |── Get Album.ipynb
 │       ├── Estilos com Deep Seek.ipynb
