@@ -39,7 +39,7 @@
       "queryLines": [
         "SELECT\r\n",
         "  master_metadata_album_artist_name,\r\n",
-        "  SUM(minutes_played) AS total_horas_ouvidas\r\n",
+        "  SUM(hours_played) AS total_horas_ouvidas\r\n",
         "FROM gold.spotify.streaming_history_com_estilos\r\n",
         "WHERE master_metadata_album_artist_name not in ('null', 'The Red Army Choir')\r\n",
         "GROUP BY master_metadata_album_artist_name\r\n",
