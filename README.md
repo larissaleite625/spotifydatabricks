@@ -95,6 +95,9 @@ As análises são consolidadas em um dashboard no Databricks Lakeview, cujos gr�
 |---------------------------------|---------------------------------|
 | ![Top 20 Artistas (Soma de Horas)](dashs/Top%2020%20Artistas%20%28Soma%20de%20Horas%29.png) | ![Top 20 Artistas (Count Plays)](dashs/Top%2020%20Artistas%20%28Count%20Plays%29.png) |
 
+| **Artistas Distintos** | **Gêneros Distintos** | **Músicas Distintas** | **Gêneros Distintos** | **Total de horas ouvidas em dias** | **Total de dias em anos** |
+|---------------------------------|---------------------------------|---------------------------------|---------------------------------|---------------------------------|---------------------------------|
+| ![Artistas Distintos](dashs/Artistas%20Distintos.png) | ![Gêneros Distintos](dashs/Gêneros%20Distintos.png) | ![Músicas Distintas](dashs/Músicas%20Distintas.png) | ![Gêneros Distintos](dashs/Álbuns%20Distintos.png) | ![Total de horas ouvidas em dias](dashs/Total%20de%20horas%20em%20dias.png) | ![Total de dias em anos](dashs/Total%20de%20dias%20em%20anos.png) |
 
 | **Distribuição de Estilos Musicais** | **Top 20 Músicas (Por Horas)** |
 |--------------------------------------|--------------------------------|
