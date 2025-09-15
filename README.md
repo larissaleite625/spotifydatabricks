@@ -97,7 +97,7 @@ As análises são consolidadas em um dashboard no Databricks Lakeview, cujos gr�
 | ![Top 20 Artistas (Soma de Horas)](dashs/Top%2020%20Artistas%20%28Soma%20de%20Horas%29.png) | ![Top 20 Artistas (Count Plays)](dashs/Top%2020%20Artistas%20%28Count%20Plays%29.png) |
 
 
-| **Distribuição de Estilos Musicais** | **Top 10 Músicas (Por Horas)** |
+| **Distribuição de Estilos Musicais** | **Top 20 Músicas (Por Horas)** |
 |--------------------------------------|--------------------------------|
 | ![Distribuição de Estilos Musicais](dashs/Distribui%C3%A7%C3%A3o%20de%20Estilos%20Musicais.png) | ![Top 10 músicas por soma de horas escutadas](dashs/Top%2010%20m%C3%BAsicas%20por%20soma%20de%20horas%20escutadas.png) |
 

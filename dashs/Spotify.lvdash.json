@@ -62,7 +62,7 @@
         "  style\r\n",
         "ORDER BY\r\n",
         "  horas_escutadas DESC\r\n",
-        "  limit 10;"
+        "  limit 15;"
       ]
     },
     {
