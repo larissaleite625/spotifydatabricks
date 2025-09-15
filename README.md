@@ -20,12 +20,12 @@ spotifydatabricks/
 |   |── Get Album.ipynb
 │   ├── Estilos com Deep Seek.ipynb
 │   └── Validacao dados 2024.ipynb
-|     
 ├── dashs/
 │   ├── Spotify.lvdash.json
 │   └── \*.png
 └── workflows/
 └── Estilos.yaml
+└── GetAlbum.yaml
 
 ```
 
