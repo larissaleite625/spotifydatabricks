@@ -2,7 +2,10 @@
 
 Este projeto de engenharia de dados implementa um pipeline completo na plataforma **Databricks** para processar, analisar e visualizar o histórico de streaming do Spotify. Usaremos a arquitetura Medalhão (Bronze, Silver, Gold), culminando em um dashboard analítico no **Lakeview**.
 
-O grande diferencial do projeto é um job automatizado que utiliza uma **LLM (DeepSeek)** para enriquecer os dados, classificando e atribuindo estilos musicais a cada faixa, permitindo análises de gênero mais profundas e precisas.
+O grande diferencial do projeto são os jobs automatizados que enriquecem os dados de duas formas:
+
+  - Utilizando o DeepSeek, que é extremamente barato, para classificar e atribuir estilos musicais a cada faixa, permitindo análises de gênero mais específicas.
+  - Consultando a API oficial do Spotify para obter metadados detalhados das músicas, como popularidade, data de lançamento do álbum e URLs das capas.
 
 ## 🏗️ Estrutura do Repositório
 
@@ -15,8 +18,10 @@ spotifydatabricks/
 │   └── spotify\_project/
 │       ├── Silver 2014-2024.ipynb
 │       ├── Silver 2025.ipynb
+        |── Get Album.ipynb
 │       ├── Estilos com Deep Seek.ipynb
 │       └── Validacao dados 2024.ipynb
+|     
 ├── dashs/
 │   ├── Spotify.lvdash.json
 │   └── \*.png
@@ -26,7 +31,7 @@ spotifydatabricks/
 ```
 
 - `src/spotify_project/`: Contém os notebooks que formam o pipeline ETL.
-- `dashs/`: Armazena os ativos do dashboard, incluindo o arquivo de definição do Lakeview (`.lvdash.json`) e as imagens de cada gráfico.
+- `dashs/`: Armazena os ativos do dashboard, incluindo o arquivo de definição do Lakeview (`spotify.lvdash.json`) e as imagens de cada gráfico.
 - `workflows/`: Contém a definição YAML do job do Databricks que automatiza o processo de enriquecimento.
 
 ---
@@ -52,6 +57,9 @@ Na camada Silver, os dados brutos são unificados, limpos e padronizados para cr
   2. O notebook **`Silver 2025.ipynb`** processa e une os novos arquivos de dados de 2025, garantindo a consistência do schema.
   3. As principais transformações incluem: conversão de timestamps, extração de features (ano, mês, hora), cálculo de métricas de tempo (`minutes_played`, `hours_played`) e limpeza de registros nulos ou inválidos.
   4. Finalmente, os dados históricos e os recentes são unidos para formar a tabela Silver consolidada.
+
+Outras:
+- **silver.spotify_eng.getalbum:** Tabela de dimensão enriquecida com metadados da API do Spotify. Orquestrado pelo job GetAlbum.yaml, enriquece os dados de forma incremental. Ele identifica músicas no histórico que ainda não possuem metadados detalhados, busca essas informações na API oficial do Spotify (como popularidade, detalhes do álbum, imagens) e as armazena na tabela silver.spotify_eng.getalbum.
 
 ### 🥇 Camada Gold: Modelagem e Análise
 
