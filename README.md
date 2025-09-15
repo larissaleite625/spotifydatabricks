@@ -29,7 +29,7 @@ spotifydatabricks/
 
 ```
 
-- `src/spotify_project/`: Contém os notebooks que formam o pipeline ETL.
+- `src/`: Contém os notebooks que formam o pipeline ETL.
 - `dashs/`: Armazena os ativos do dashboard, incluindo o arquivo de definição do Lakeview (`spotify.lvdash.json`) e as imagens de cada gráfico.
 - `workflows/`: Contém a definição YAML do job do Databricks que automatiza o processo de enriquecimento.
 
