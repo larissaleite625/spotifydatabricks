@@ -322,9 +322,9 @@
           },
           "position": {
             "x": 0,
-            "y": 13,
+            "y": 16,
             "width": 3,
-            "height": 7
+            "height": 9
           }
         },
         {
@@ -425,7 +425,7 @@
             "x": 0,
             "y": 6,
             "width": 3,
-            "height": 7
+            "height": 10
           }
         },
         {
@@ -541,7 +541,7 @@
           },
           "position": {
             "x": 3,
-            "y": 13,
+            "y": 18,
             "width": 3,
             "height": 7
           }
@@ -634,9 +634,9 @@
           },
           "position": {
             "x": 0,
-            "y": 28,
+            "y": 35,
             "width": 6,
-            "height": 7
+            "height": 8
           }
         },
         {
@@ -761,7 +761,7 @@
               "condensed": true,
               "withRowNumber": true,
               "frame": {
-                "title": "Top 10 músicas por soma de horas escutadas",
+                "title": "Top 20 músicas por soma de horas escutadas",
                 "showTitle": true
               }
             }
@@ -770,7 +770,7 @@
             "x": 3,
             "y": 6,
             "width": 3,
-            "height": 7
+            "height": 12
           }
         },
         {
@@ -879,9 +879,9 @@
           },
           "position": {
             "x": 0,
-            "y": 20,
+            "y": 25,
             "width": 6,
-            "height": 8
+            "height": 10
           }
         }
       ],
