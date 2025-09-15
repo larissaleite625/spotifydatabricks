@@ -121,6 +121,53 @@
         "QUALIFY rk = 1\r\n",
         "ORDER BY year DESC;\r\n"
       ]
+    },
+    {
+      "name": "2ae8579c",
+      "displayName": "Distinct_Musicas",
+      "queryLines": [
+        "SELECT COUNT(id_musics) AS MUSICAS_DISTICT from silver.spotify_musics.musicas"
+      ]
+    },
+    {
+      "name": "fc8b5610",
+      "displayName": "Distincts_Artistas",
+      "queryLines": [
+        "SELECT COUNT(*) FROM\r\n",
+        "(SELECT DISTINCT master_metadata_album_artist_name FROM gold.spotify.spotify_musicas)"
+      ]
+    },
+    {
+      "name": "75dfb7af",
+      "displayName": "Distincts_Albuns",
+      "queryLines": [
+        "SELECT COUNT(*) FROM\r\n",
+        "(SELECT DISTINCT master_metadata_album_album_name FROM gold.spotify.spotify_analise)"
+      ]
+    },
+    {
+      "name": "7bb6e8f0",
+      "displayName": "Unique Music Styles Count",
+      "queryLines": [
+        "SELECT COUNT(*) FROM\r\n",
+        "(SELECT DISTINCT style from gold.spotify.spotify_musicas)"
+      ]
+    },
+    {
+      "name": "f322a0fa",
+      "displayName": "Total Ouvido",
+      "queryLines": [
+        "SELECT TOTAL_OUVIDO/24 FROM\r\n",
+        "(SELECT SUM(hours_played) AS TOTAL_OUVIDO FROM gold.spotify.streaming_history_com_estilos)"
+      ]
+    },
+    {
+      "name": "80c42381",
+      "displayName": "Quantos dias ouvir",
+      "queryLines": [
+        "SELECT COUNT(*)/365 DIAS_ANOS FROM (\r\n",
+        "SELECT DISTINCT (TO_DATE(ts, \"yyyyMMdd\")) AS DIAS from gold.spotify.streaming_history_com_estilos)"
+      ]
     }
   ],
   "pages": [
@@ -634,7 +681,7 @@
           },
           "position": {
             "x": 0,
-            "y": 35,
+            "y": 27,
             "width": 6,
             "height": 8
           }
@@ -879,9 +926,249 @@
           },
           "position": {
             "x": 0,
-            "y": 25,
+            "y": 35,
             "width": 6,
             "height": 10
+          }
+        },
+        {
+          "widget": {
+            "name": "d99fa4ed",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2ae8579c",
+                  "fields": [
+                    {
+                      "name": "MUSICAS_DISTICT",
+                      "expression": "`MUSICAS_DISTICT`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "MUSICAS_DISTICT",
+                  "displayName": "MUSICAS_DISTICT"
+                }
+              },
+              "frame": {
+                "title": "Músicas Distintas",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 25,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "a94dc137",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "fc8b5610",
+                  "fields": [
+                    {
+                      "name": "count(1)",
+                      "expression": "`count(1)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(1)",
+                  "displayName": "count(1)"
+                }
+              },
+              "frame": {
+                "title": "Artistas Distintos",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 25,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "9f942fb8",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7bb6e8f0",
+                  "fields": [
+                    {
+                      "name": "count(1)",
+                      "expression": "`count(1)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(1)",
+                  "displayName": "count(1)"
+                }
+              },
+              "frame": {
+                "title": "Gêneros Distintos",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 25,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "56ee427a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "75dfb7af",
+                  "fields": [
+                    {
+                      "name": "sum(count(1))",
+                      "expression": "SUM(`count(1)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(count(1))",
+                  "displayName": "Sum of count(1)"
+                }
+              },
+              "frame": {
+                "title": "Álbuns Distintos",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 25,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f0dbb7ec",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f322a0fa",
+                  "fields": [
+                    {
+                      "name": "(TOTAL_OUVIDO / 24)",
+                      "expression": "`(TOTAL_OUVIDO / 24)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "(TOTAL_OUVIDO / 24)",
+                  "displayName": "(TOTAL_OUVIDO / 24)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total de horas em dias"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 25,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "8b6563ac",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "80c42381",
+                  "fields": [
+                    {
+                      "name": "DIAS_ANOS",
+                      "expression": "`DIAS_ANOS`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "DIAS_ANOS",
+                  "displayName": "DIAS_ANOS"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total de dias em anos"
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 25,
+            "width": 1,
+            "height": 2
           }
         }
       ],
